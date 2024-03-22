@@ -29,6 +29,7 @@
 - [ ] Start creating controller endpoint: mark item "not done"
 - [ ] Start creating controller endpoint: get all items that are "not done" / with an option to retrieve all (add filtering)
 - [ ] Start creating controller endpoint: get details of a specific item
+- [ ] Update a todo item when it is past due.
 
 ## Production readiness
 * add authorization
