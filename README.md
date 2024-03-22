@@ -16,11 +16,9 @@
   * docker-compose up -f compose.yaml -d
 
 ## Stopping the docker container and cleaning the resources
- CHECK TODOS!
 * Make sure your local docker is up and running
 * Command to stop the service:
   * docker-compose down -f compose.yaml
-  * docker rmi $(IMAGE_NAME) //!!!TODO!!!
   
 
 ## Todo List
