@@ -35,6 +35,6 @@ public class Todo {
     private OffsetDateTime doneDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "default 'NOT_DONE'")
+    @Column(columnDefinition = "varchar(20) default 'NOT_DONE'")
     private TodoStatus status;
 }
