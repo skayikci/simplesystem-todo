@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TodoServiceImpl implements TodoService {
     @Override
-    public Todo createTodo(Todo todoItem) {
-        return Todo.builder().id(todoItem.getId()).build();
+    public Todo createTodo(Todo todoRequest) {
+        return Todo.builder().id(todoRequest.getId()).build();
     }
 }

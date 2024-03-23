@@ -1,7 +1,8 @@
 package com.simplesystem.todo.model;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="TODOS")
+@Table(name = "TODOS")
 public class Todo {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -28,11 +29,14 @@ public class Todo {
 
     private String description;
 
-    private OffsetDateTime createdDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "ddMMyyyy HH:mm:ss")
+    private LocalDateTime createdDate;
 
-    private OffsetDateTime dueDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "ddMMyyyy HH:mm:ss")
+    private LocalDateTime dueDate;
 
-    private OffsetDateTime doneDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "ddMMyyyy HH:mm:ss")
+    private LocalDateTime doneDate;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(20) default 'NOT_DONE'")

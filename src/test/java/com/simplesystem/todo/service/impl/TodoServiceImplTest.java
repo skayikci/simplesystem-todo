@@ -1,5 +1,6 @@
 package com.simplesystem.todo.service.impl;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -20,7 +21,7 @@ class TodoServiceImplTest {
     @Test
     void shouldAddATodoItem() {
         var mockTodoItemId = UUID.randomUUID().toString();
-        var mockCreatedDate = OffsetDateTime.now();
+        var mockCreatedDate = LocalDateTime.now();
         var todoItem = Todo.builder()
                 .id(mockTodoItemId)
                 .description("i will do this")
