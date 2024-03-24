@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.simplesystem.todo.controller.exception.InvalidEntityException;
 import com.simplesystem.todo.model.Todo;
+import com.simplesystem.todo.model.TodoStatus;
 import com.simplesystem.todo.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,9 @@ public class TodoController {
         }
         if (todoRequest.getDueDate() != null && todoRequest.getDueDate().isBefore(todoRequest.getCreatedDate())) {
             throw new InvalidEntityException("Invalid entity, please check due date");
+        }
+        if (TodoStatus.PAST_DUE.equals(todoRequest.getStatus())) {
+            throw new InvalidEntityException("Invalid entity, please check input status");
         }
         var createdTodoItem = todoService.createTodo(todoRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTodoItem);

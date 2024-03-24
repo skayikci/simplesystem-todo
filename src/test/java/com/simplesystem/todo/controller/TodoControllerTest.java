@@ -84,6 +84,29 @@ class TodoControllerTest {
     }
 
     @Test
+    void shouldGetInvalidEntityExceptionWhenStatusIsProvidedAsPAST_DUEOnCreation() throws Exception {
+        var todoId = UUID.randomUUID();
+        String description = "i will do this with past_due creation status";
+        Todo todoRequest = getTodoRequest(description).build();
+        todoRequest.setStatus(TodoStatus.PAST_DUE);
+        String requestUrl = "/api/v1/todo";
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
+                .create();
+        MockHttpServletRequestBuilder mockMvcRequestBuilders = MockMvcRequestBuilders
+                .post(requestUrl)
+                .content(gson.toJson(todoRequest))
+                .contentType(MediaType.APPLICATION_JSON);
+
+
+        mockMvc.perform(mockMvcRequestBuilders)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("Invalid entity, please check input status"));
+
+        verifyNoInteractions(todoService);
+    }
+
+    @Test
     void shouldGetTodoItemById() throws Exception {
         var todoId = UUID.randomUUID();
         String description = "i will get this todo by id";
