@@ -25,6 +25,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -56,6 +57,30 @@ class TodoControllerTest {
                 .andExpect(status().isCreated());
 
         verify(todoService, times(1)).createTodo(any(Todo.class));
+    }
+
+    @Test
+    void shouldGetInvalidEntityExceptionWhenDueDateIsLessThanCreatedDate() throws Exception {
+        var todoId = UUID.randomUUID();
+        String description = "i will do this with old due date";
+        LocalDateTime createdDate = LocalDateTime.now();
+        LocalDateTime dueDate = createdDate.minusDays(10L);
+        Todo todoRequest = getTodoRequestWithDate(todoId, description, createdDate, dueDate).build();
+        String requestUrl = "/api/v1/todo";
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
+                .create();
+        MockHttpServletRequestBuilder mockMvcRequestBuilders = MockMvcRequestBuilders
+                .post(requestUrl)
+                .content(gson.toJson(todoRequest))
+                .contentType(MediaType.APPLICATION_JSON);
+
+
+        mockMvc.perform(mockMvcRequestBuilders)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value("Invalid entity, please check due date"));
+
+        verifyNoInteractions(todoService);
     }
 
     @Test

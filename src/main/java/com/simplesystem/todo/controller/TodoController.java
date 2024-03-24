@@ -1,7 +1,9 @@
 package com.simplesystem.todo.controller;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.simplesystem.todo.controller.exception.InvalidEntityException;
 import com.simplesystem.todo.model.Todo;
 import com.simplesystem.todo.service.TodoService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,14 @@ public class TodoController {
     private final TodoService todoService;
 
     @PostMapping
-    public ResponseEntity createTodoItemWithBody(@RequestBody Todo todoRequest) {
+    public ResponseEntity createTodoItemWithBody(@RequestBody Todo todoRequest) throws InvalidEntityException {
+        if (todoRequest.getCreatedDate() == null) {
+            LocalDateTime createdDate = LocalDateTime.now();
+            todoRequest.setCreatedDate(createdDate);
+        }
+        if (todoRequest.getDueDate() != null && todoRequest.getDueDate().isBefore(todoRequest.getCreatedDate())) {
+            throw new InvalidEntityException("Invalid entity, please check due date");
+        }
         var createdTodoItem = todoService.createTodo(todoRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTodoItem);
     }
