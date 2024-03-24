@@ -1,7 +1,6 @@
 package com.simplesystem.todo.service.impl;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import com.simplesystem.todo.model.Todo;
@@ -34,7 +33,7 @@ class TodoServiceImplTest {
                 .id(mockTodoItemId)
                 .description("i will do this")
                 .createdDate(mockCreatedDate)
-                .dueDate(mockCreatedDate.minusDays(10L))
+                .dueDate(mockCreatedDate.minusDays(-10L))
                 .status(TodoStatus.NOT_DONE)
                 .build();
         when(todoRepository.save(any(Todo.class))).thenReturn(todoItem);
@@ -43,6 +42,31 @@ class TodoServiceImplTest {
 
         assertEquals(mockTodoItemId, todoItemVerificationEntity.getId());
         verify(todoRepository, times(1)).save(todoItem);
+    }
+
+    @Test
+    void shouldGetATodoItemById() {
+        var mockTodoItemId = UUID.randomUUID();
+        var mockCreatedDate = LocalDateTime.now();
+        String description = "i will get this todo by id in the service";
+        LocalDateTime mockDueDate = mockCreatedDate.minusDays(-10L);
+        var todoItem = Todo.builder()
+                .id(mockTodoItemId)
+                .description(description)
+                .createdDate(mockCreatedDate)
+                .dueDate(mockDueDate)
+                .status(TodoStatus.NOT_DONE)
+                .build();
+        when(todoRepository.getReferenceById(mockTodoItemId.toString())).thenReturn(todoItem);
+
+        var todoItemVerificationEntity = todoService.getTodoById(mockTodoItemId);
+
+        assertEquals(mockTodoItemId, todoItemVerificationEntity.getId());
+        assertEquals(description, todoItemVerificationEntity.getDescription());
+        assertEquals(mockCreatedDate, todoItemVerificationEntity.getCreatedDate());
+        assertEquals(mockDueDate, todoItemVerificationEntity.getDueDate());
+        assertEquals(TodoStatus.NOT_DONE, todoItemVerificationEntity.getStatus());
+        verify(todoRepository, times(1)).getReferenceById(mockTodoItemId.toString());
     }
 
 }

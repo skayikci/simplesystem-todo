@@ -21,6 +21,6 @@ public class TodoServiceImpl implements TodoService {
 
     @Override
     public Todo getTodoById(UUID todoId) {
-        return Todo.builder().id(todoId).build();
+        return todoRepository.getReferenceById(todoId.toString());
     }
 }
