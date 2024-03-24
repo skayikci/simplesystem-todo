@@ -46,7 +46,7 @@ class TodoServiceImplTest {
         String description = "i will get this todo by id in the service";
         LocalDateTime mockDueDate = mockCreatedDate.minusDays(-10L);
         Todo todoItem = getTodo(mockTodoItemId, mockCreatedDate, description, mockDueDate);
-        when(todoRepository.getReferenceById(mockTodoItemId.toString())).thenReturn(todoItem);
+        when(todoRepository.getReferenceById(mockTodoItemId)).thenReturn(todoItem);
 
         var todoItemVerificationEntity = todoService.getTodoById(mockTodoItemId);
 
@@ -55,7 +55,7 @@ class TodoServiceImplTest {
         assertEquals(mockCreatedDate, todoItemVerificationEntity.getCreatedDate());
         assertEquals(mockDueDate, todoItemVerificationEntity.getDueDate());
         assertEquals(TodoStatus.NOT_DONE, todoItemVerificationEntity.getStatus());
-        verify(todoRepository, times(1)).getReferenceById(mockTodoItemId.toString());
+        verify(todoRepository, times(1)).getReferenceById(mockTodoItemId);
     }
 
     private Todo getTodo(UUID mockTodoItemId, LocalDateTime mockCreatedDate, String description, LocalDateTime mockDueDate) {

@@ -89,12 +89,12 @@ class TodoControllerTest {
             MockHttpServletRequestBuilder mockMvcRequestBuilders = MockMvcRequestBuilders
                     .get(requestUrl)
                     .contentType(MediaType.APPLICATION_JSON);
-            when(todoService.getTodoById(todoId)).thenThrow(new EntityNotFoundException("Entity not found, please check input id"));
+            when(todoService.getTodoById(todoId)).thenThrow(new EntityNotFoundException("Unable to find com.simplesystem.todo.model.Todo with id"));
 
 
             mockMvc.perform(mockMvcRequestBuilders)
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$").value("Entity not found, please check input id"));
+                    .andExpect(jsonPath("$").value("Unable to find com.simplesystem.todo.model.Todo with id"));
 
             verify(todoService, times(1)).getTodoById(todoId);
         }

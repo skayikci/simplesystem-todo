@@ -40,8 +40,8 @@ public class TodoController {
     }
 
     @GetMapping("/{todoId}")
-    public ResponseEntity getTodoItemById(@PathVariable UUID todoId) {
-        var todoItemReturned = todoService.getTodoById(todoId);
+    public ResponseEntity getTodoItemById(@PathVariable String todoId) {
+        var todoItemReturned = todoService.getTodoById(UUID.fromString(todoId));
         return ResponseEntity.status(HttpStatus.OK).body(todoItemReturned);
     }
 
