@@ -48,7 +48,7 @@ class TodoControllerTest {
     }
 
     private Todo.TodoBuilder getTodoRequest(String description) {
-        return Todo.builder().description(description);
+        return Todo.builder().id(UUID.randomUUID()).description(description);
     }
 
     @Nested
@@ -164,6 +164,31 @@ class TodoControllerTest {
                     .andExpect(jsonPath("$").value("Invalid entity, please check input status"));
 
             verifyNoInteractions(todoService);
+        }
+    }
+
+    @Nested
+    class UpdateTodoItemTests {
+        @Test
+        void shouldUpdateATodoItemViaRestPATCH() throws Exception {
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
+                    .create();
+            Todo todoRequest = getTodoRequest("i will update this via rest post").build();
+            String requestUrl = "/api/v1/todo";
+            MockHttpServletRequestBuilder mockMvcRequestBuilders = MockMvcRequestBuilders
+                    .patch(requestUrl)
+                    .content(gson.toJson(todoRequest))
+                    .contentType(MediaType.APPLICATION_JSON);
+            when(todoService.updateTodo(todoRequest)).thenReturn(todoRequest);
+
+
+            mockMvc.perform(mockMvcRequestBuilders)
+                    .andExpect(status().isAccepted())
+                    .andExpect(jsonPath("$.id").value(equalTo(todoRequest.getId().toString())))
+                    .andExpect(jsonPath("$.description").value(equalTo(todoRequest.getDescription())));
+
+            verify(todoService, times(1)).updateTodo(any(Todo.class));
         }
     }
 }

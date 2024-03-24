@@ -8,4 +8,6 @@ public interface TodoService {
     Todo createTodo(Todo todoItem);
 
     Todo getTodoById(UUID todoId);
+
+    Todo updateTodo(Todo any);
 }

@@ -23,4 +23,10 @@ public class TodoServiceImpl implements TodoService {
     public Todo getTodoById(UUID todoId) {
         return todoRepository.getReferenceById(todoId);
     }
+
+    @Override
+    public Todo updateTodo(Todo todoRequest) {
+        var requestedTodoItem = todoRepository.findById(todoRequest.getId());
+        return requestedTodoItem.isPresent() ? todoRepository.save(todoRequest) : null;
+    }
 }
