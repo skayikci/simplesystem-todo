@@ -28,7 +28,7 @@ class TodoServiceImplTest {
 
     @Test
     void shouldAddATodoItem() {
-        var mockTodoItemId = UUID.randomUUID().toString();
+        var mockTodoItemId = UUID.randomUUID();
         var mockCreatedDate = LocalDateTime.now();
         var todoItem = Todo.builder()
                 .id(mockTodoItemId)
