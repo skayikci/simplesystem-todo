@@ -1,6 +1,7 @@
 package com.simplesystem.todo.model;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
@@ -15,6 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Data
@@ -25,11 +28,12 @@ import lombok.NoArgsConstructor;
 public class Todo {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
+    private UUID id;
 
     private String description;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "ddMMyyyy HH:mm:ss")
+    @CreationTimestamp
     private LocalDateTime createdDate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "ddMMyyyy HH:mm:ss")
@@ -39,6 +43,6 @@ public class Todo {
     private LocalDateTime doneDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "varchar(20) default 'NOT_DONE'")
-    private TodoStatus status;
+    @Column(length = 20, columnDefinition = "varchar(20) default 'NOT_DONE'")
+    private TodoStatus status = TodoStatus.NOT_DONE;
 }
