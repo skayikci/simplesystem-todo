@@ -29,18 +29,13 @@ class TodoServiceImplTest {
     void shouldAddATodoItem() {
         var mockTodoItemId = UUID.randomUUID();
         var mockCreatedDate = LocalDateTime.now();
-        var todoItem = Todo.builder()
-                .id(mockTodoItemId)
-                .description("i will do this")
-                .createdDate(mockCreatedDate)
-                .dueDate(mockCreatedDate.minusDays(-10L))
-                .status(TodoStatus.NOT_DONE)
-                .build();
+        Todo todoItem = getTodo(mockTodoItemId, mockCreatedDate, "i will do this", mockCreatedDate.minusDays(-10L));
         when(todoRepository.save(any(Todo.class))).thenReturn(todoItem);
 
         var todoItemVerificationEntity = todoService.createTodo(todoItem);
 
         assertEquals(mockTodoItemId, todoItemVerificationEntity.getId());
+        assertEquals(mockCreatedDate, todoItemVerificationEntity.getCreatedDate());
         verify(todoRepository, times(1)).save(todoItem);
     }
 
@@ -50,13 +45,7 @@ class TodoServiceImplTest {
         var mockCreatedDate = LocalDateTime.now();
         String description = "i will get this todo by id in the service";
         LocalDateTime mockDueDate = mockCreatedDate.minusDays(-10L);
-        var todoItem = Todo.builder()
-                .id(mockTodoItemId)
-                .description(description)
-                .createdDate(mockCreatedDate)
-                .dueDate(mockDueDate)
-                .status(TodoStatus.NOT_DONE)
-                .build();
+        Todo todoItem = getTodo(mockTodoItemId, mockCreatedDate, description, mockDueDate);
         when(todoRepository.getReferenceById(mockTodoItemId.toString())).thenReturn(todoItem);
 
         var todoItemVerificationEntity = todoService.getTodoById(mockTodoItemId);
@@ -67,6 +56,16 @@ class TodoServiceImplTest {
         assertEquals(mockDueDate, todoItemVerificationEntity.getDueDate());
         assertEquals(TodoStatus.NOT_DONE, todoItemVerificationEntity.getStatus());
         verify(todoRepository, times(1)).getReferenceById(mockTodoItemId.toString());
+    }
+
+    private Todo getTodo(UUID mockTodoItemId, LocalDateTime mockCreatedDate, String description, LocalDateTime mockDueDate) {
+        return Todo.builder()
+                .id(mockTodoItemId)
+                .description(description)
+                .createdDate(mockCreatedDate)
+                .dueDate(mockDueDate)
+                .status(TodoStatus.NOT_DONE)
+                .build();
     }
 
 }

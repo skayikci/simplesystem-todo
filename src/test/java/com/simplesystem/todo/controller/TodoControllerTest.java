@@ -45,11 +45,7 @@ class TodoControllerTest {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
                 .create();
-        var todoRequest = Todo.builder()
-                .description("i will do this via rest post")
-                .createdDate(LocalDateTime.now())
-                .dueDate(LocalDateTime.now().minusDays(-10L))
-                .build();
+        Todo todoRequest = getTodoRequest("i will do this via rest post").build();
         String requestUrl = "/api/v1/todo";
         MockHttpServletRequestBuilder mockMvcRequestBuilders = MockMvcRequestBuilders
                 .post(requestUrl)
@@ -68,12 +64,7 @@ class TodoControllerTest {
         String description = "i will get this todo by id";
         LocalDateTime createdDate = LocalDateTime.now();
         LocalDateTime dueDate = createdDate.minusDays(-10L);
-        var todoRequest = Todo.builder()
-                .id(todoId)
-                .description(description)
-                .createdDate(createdDate)
-                .dueDate(dueDate)
-                .build();
+        Todo todoRequest = getTodoRequestWithDate(todoId, description, createdDate, dueDate).build();
         String requestUrl = "/api/v1/todo/".concat(todoId.toString());
         MockHttpServletRequestBuilder mockMvcRequestBuilders = MockMvcRequestBuilders
                 .get(requestUrl)
@@ -92,5 +83,13 @@ class TodoControllerTest {
 
 
         verify(todoService, times(1)).getTodoById(todoId);
+    }
+
+    private Todo.TodoBuilder getTodoRequestWithDate(UUID todoId, String description, LocalDateTime createdDate, LocalDateTime dueDate) {
+        return getTodoRequest(description).id(todoId).createdDate(createdDate).dueDate(dueDate);
+    }
+
+    private Todo.TodoBuilder getTodoRequest(String description) {
+        return Todo.builder().description(description);
     }
 }
