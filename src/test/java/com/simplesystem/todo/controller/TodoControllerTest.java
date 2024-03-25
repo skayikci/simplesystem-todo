@@ -83,8 +83,6 @@ class TodoControllerTest {
         @Test
         void shouldGetEntityNotFoundExceptionWhenIdNotFound() throws Exception {
             var todoId = UUID.randomUUID();
-            String description = "i will get this todo by id";
-            Todo todoRequest = getTodoRequest(description).build();
             String requestUrl = "/api/v1/todo/".concat(todoId.toString());
             MockHttpServletRequestBuilder mockMvcRequestBuilders = MockMvcRequestBuilders
                     .get(requestUrl)
@@ -97,6 +95,21 @@ class TodoControllerTest {
                     .andExpect(jsonPath("$").value("Unable to find com.simplesystem.todo.model.Todo with id"));
 
             verify(todoService, times(1)).getTodoById(todoId);
+        }
+
+        @Test
+        void shouldGetIllegalArgumentExceptionWhenIdIsInvalid() throws Exception {
+            var todoId = "0000";
+            String requestUrl = "/api/v1/todo/".concat(todoId);
+            MockHttpServletRequestBuilder mockMvcRequestBuilders = MockMvcRequestBuilders
+                    .get(requestUrl)
+                    .contentType(MediaType.APPLICATION_JSON);
+
+            mockMvc.perform(mockMvcRequestBuilders)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$").value("Invalid UUID string: ".concat(todoId)));
+
+            verifyNoInteractions(todoService);
         }
     }
 

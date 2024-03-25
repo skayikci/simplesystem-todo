@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.simplesystem.todo.model.Todo;
 import com.simplesystem.todo.model.TodoStatus;
 import com.simplesystem.todo.repository.TodoRepository;
+import com.simplesystem.todo.service.InvalidInputException;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -60,6 +62,19 @@ class TodoServiceImplTest {
         assertEquals(mockDueDate, todoItemVerificationEntity.getDueDate());
         assertEquals(TodoStatus.NOT_DONE, todoItemVerificationEntity.getStatus());
         verify(todoRepository, times(1)).getReferenceById(mockTodoItemId);
+    }
+
+    @Test
+    void shouldGetInvalidInputExceptionWhenIdNotProvided() {
+        assertThrows(InvalidInputException.class, () -> todoService.getTodoById(null));
+
+        verifyNoInteractions(todoRepository);
+    }
+    @Test
+    void shouldGetIllegalArgumentExceptionWhenIdInvalid() {
+        assertThrows(IllegalArgumentException.class, () -> todoService.getTodoById(UUID.fromString("123")));
+
+        verifyNoInteractions(todoRepository);
     }
 
     @Test

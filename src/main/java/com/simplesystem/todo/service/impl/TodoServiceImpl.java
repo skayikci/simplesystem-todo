@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.simplesystem.todo.model.Todo;
 import com.simplesystem.todo.repository.TodoRepository;
+import com.simplesystem.todo.service.InvalidInputException;
 import com.simplesystem.todo.service.TodoService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,9 @@ public class TodoServiceImpl implements TodoService {
 
     @Override
     public Todo getTodoById(UUID todoId) {
+        if(todoId == null) {
+            throw new InvalidInputException("Id of the todo item is not provided or invalid");
+        }
         return todoRepository.getReferenceById(todoId);
     }
 

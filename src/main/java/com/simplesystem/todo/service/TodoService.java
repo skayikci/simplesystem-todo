@@ -7,7 +7,7 @@ import com.simplesystem.todo.model.Todo;
 public interface TodoService {
     Todo createTodo(Todo todoItem);
 
-    Todo getTodoById(UUID todoId);
+    Todo getTodoById(UUID todoId) throws InvalidInputException;
 
     Todo updateTodo(Todo any);
 }
