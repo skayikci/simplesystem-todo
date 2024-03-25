@@ -29,11 +29,12 @@ public class TodoServiceImpl implements TodoService {
     }
 
     @Override
-    public Todo getTodoById(UUID todoId) {
+    public TodoResponse getTodoById(UUID todoId) {
         if (todoId == null) {
             throw new InvalidInputException("Id of the todo item is not provided or invalid");
         }
-        return todoRepository.getReferenceById(todoId);
+        Todo foundTodo = todoRepository.getReferenceById(todoId);
+        return todoMapper.mapEntityToResponse(foundTodo);
     }
 
     @Override

@@ -69,12 +69,12 @@ class TodoControllerTest {
             String description = "i will get this todo by id";
             LocalDateTime createdDate = LocalDateTime.now();
             LocalDateTime dueDate = createdDate.minusDays(-10L);
-            Todo todoRequest = getTodoRequestWithDate(todoId, description, createdDate, dueDate).build();
+            TodoResponse todoResponse = generateTodoResponse(todoId, description, createdDate, dueDate, TodoStatus.NOT_DONE);
             String requestUrl = "/api/v1/todo/".concat(todoId.toString());
             MockHttpServletRequestBuilder mockMvcRequestBuilders = MockMvcRequestBuilders
                     .get(requestUrl)
                     .contentType(MediaType.APPLICATION_JSON);
-            when(todoService.getTodoById(todoId)).thenReturn(todoRequest);
+            when(todoService.getTodoById(todoId)).thenReturn(todoResponse);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy HH:mm:ss");
 
 
