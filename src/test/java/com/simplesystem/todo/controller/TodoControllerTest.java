@@ -7,7 +7,6 @@ import java.util.UUID;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.simplesystem.todo.controller.adapter.LocalDateTimeTypeAdapter;
-import com.simplesystem.todo.model.Todo;
 import com.simplesystem.todo.model.TodoRequest;
 import com.simplesystem.todo.model.TodoResponse;
 import com.simplesystem.todo.model.TodoStatus;

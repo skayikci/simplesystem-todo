@@ -24,12 +24,12 @@
 ## Todo List
 - [X] Create Database Diagram
 - [X] Start creating controller endpoint : add item
-- [ ] Start creating controller endpoint: change description of item
-- [ ] Start creating controller endpoint: mark item done
-- [ ] Start creating controller endpoint: mark item "not done"
+- [X] Start creating controller endpoint: change description of item
+- [X] Start creating controller endpoint: mark item done
+- [X] Start creating controller endpoint: mark item "not done"
 - [ ] Start creating controller endpoint: get all items that are "not done" / with an option to retrieve all (add filtering)
 - [X] Start creating controller endpoint: get details of a specific item
-- [ ] Update a todo item when it is past due.
+- [x] Update a todo item when it is past due.
 
 ## Production readiness
 * add authorization
