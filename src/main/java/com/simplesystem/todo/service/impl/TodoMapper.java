@@ -10,11 +10,13 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface TodoMapper {
     @Mapping(target = "status", constant = "NOT_DONE")
-    @Mapping(target = "createdDate", defaultExpression = "java(LocalDateTime.now())", dateFormat = "ddMMyyyy HH:mm:ss")
+    @Mapping(target = "createdDate", defaultExpression = "java(java.time.LocalDateTime.now())", dateFormat = "ddMMyyyy HH:mm:ss")
     Todo mapRequestToEntity(TodoRequest todoRequest);
 
     @Mapping(target = "status", constant = "NOT_DONE")
-    @Mapping(target = "createdDate", defaultExpression = "java(LocalDateTime.now())", dateFormat = "ddMMyyyy HH:mm:ss")
+    @Mapping(target = "createdDate", expression = "java(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(\"ddMMyyyy HH:mm:ss\")))")
+    @Mapping(target = "dueDate", dateFormat = "ddMMyyyy HH:mm:ss")
+    @Mapping(target = "doneDate", dateFormat = "ddMMyyyy HH:mm:ss")
     TodoResponse mapEntityToResponse(Todo todoEntity);
 
     void updateTodoFromRequest(@MappingTarget Todo requestedTodoItem, TodoRequest todoRequest);

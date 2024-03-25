@@ -45,19 +45,11 @@ class TodoControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    private Todo.TodoBuilder getTodoRequestWithDate(UUID todoId, String description, LocalDateTime createdDate, LocalDateTime dueDate) {
-        return getTodoRequest(description).id(todoId).createdDate(createdDate).dueDate(dueDate);
-    }
-
-    private Todo.TodoBuilder getTodoRequest(String description) {
-        return Todo.builder().id(UUID.randomUUID()).description(description);
-    }
-
     private TodoRequest generateTodoRequest(UUID mockTodoItemId, String description, LocalDateTime mockCreatedDate, LocalDateTime dueDate, TodoStatus todoStatus) {
         return new TodoRequest(mockTodoItemId, description, mockCreatedDate, dueDate, null, todoStatus);
     }
 
-    private TodoResponse generateTodoResponse(UUID todoId, String description, LocalDateTime createdDate, LocalDateTime dueDate, TodoStatus status) {
+    private TodoResponse generateTodoResponse(UUID todoId, String description, String createdDate, String dueDate, TodoStatus status) {
         return new TodoResponse(todoId, description, createdDate, dueDate, null, status);
     }
 
@@ -69,14 +61,13 @@ class TodoControllerTest {
             String description = "i will get this todo by id";
             LocalDateTime createdDate = LocalDateTime.now();
             LocalDateTime dueDate = createdDate.minusDays(-10L);
-            TodoResponse todoResponse = generateTodoResponse(todoId, description, createdDate, dueDate, TodoStatus.NOT_DONE);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy HH:mm:ss");
+            TodoResponse todoResponse = generateTodoResponse(todoId, description, formatter.format(createdDate), formatter.format(dueDate), TodoStatus.NOT_DONE);
             String requestUrl = "/api/v1/todo/".concat(todoId.toString());
             MockHttpServletRequestBuilder mockMvcRequestBuilders = MockMvcRequestBuilders
                     .get(requestUrl)
                     .contentType(MediaType.APPLICATION_JSON);
             when(todoService.getTodoById(todoId)).thenReturn(todoResponse);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy HH:mm:ss");
-
 
             mockMvc.perform(mockMvcRequestBuilders)
                     .andExpect(status().isOk())
