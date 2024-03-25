@@ -190,5 +190,26 @@ class TodoControllerTest {
 
             verify(todoService, times(1)).updateTodo(any(Todo.class));
         }
+
+        @Test
+        void shouldNotUpdateATodoWhenNotFound() throws Exception {
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
+                    .create();
+            Todo todoRequest = getTodoRequest("i will update this via rest post").build();
+            String requestUrl = "/api/v1/todo";
+            MockHttpServletRequestBuilder mockMvcRequestBuilders = MockMvcRequestBuilders
+                    .patch(requestUrl)
+                    .content(gson.toJson(todoRequest))
+                    .contentType(MediaType.APPLICATION_JSON);
+            when(todoService.updateTodo(todoRequest)).thenThrow(new EntityNotFoundException("Given entity with id not found"));
+
+
+            mockMvc.perform(mockMvcRequestBuilders)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$").value("Given entity with id not found"));
+
+            verify(todoService, times(1)).updateTodo(any(Todo.class));
+        }
     }
 }
