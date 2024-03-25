@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -44,10 +45,16 @@ public class TodoController {
         return ResponseEntity.status(HttpStatus.OK).body(todoItemReturned);
     }
 
-    @PatchMapping()
+    @PatchMapping
     public ResponseEntity updateTodoItemById(@RequestBody TodoRequest todoRequest) {
         var todoItemReturned = todoService.updateTodo(todoRequest);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(todoItemReturned);
+    }
+
+    @GetMapping
+    public ResponseEntity filterByTodoStatus(@RequestParam(value = "status", required = false) TodoStatus todoStatus) {
+        var todoItemsReturned = todoService.filterByStatus(todoStatus);
+        return ResponseEntity.status(HttpStatus.OK).body(todoItemsReturned);
     }
 
 }

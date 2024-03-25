@@ -27,7 +27,7 @@
 - [X] Start creating controller endpoint: change description of item
 - [X] Start creating controller endpoint: mark item done
 - [X] Start creating controller endpoint: mark item "not done"
-- [ ] Start creating controller endpoint: get all items that are "not done" / with an option to retrieve all (add filtering)
+- [x] Start creating controller endpoint: get all items that are "not done" / with an option to retrieve all (add filtering)
 - [X] Start creating controller endpoint: get details of a specific item
 - [x] Update a todo item when it is past due.
 

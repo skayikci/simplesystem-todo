@@ -47,6 +47,5 @@ public class Todo {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, columnDefinition = "varchar(20) default 'NOT_DONE'")
-    @Builder.Default
-    private TodoStatus status = TodoStatus.NOT_DONE;
+    private TodoStatus status;
 }
