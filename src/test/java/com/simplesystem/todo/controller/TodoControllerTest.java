@@ -178,6 +178,27 @@ class TodoControllerTest {
 
             verifyNoInteractions(todoService);
         }
+
+        @Test
+        void shouldGetHttpMessageNotReadableExceptionWhenInvalidStatusProvided() throws Exception {
+            String requestUrl = "/api/v1/todo";
+            MockHttpServletRequestBuilder mockMvcRequestBuilders = MockMvcRequestBuilders
+                    .post(requestUrl)
+                    .content("""
+                            {
+                            	"description": "test with invalid status",
+                            	"status": "INVALID"
+                            }
+                            """)
+                    .contentType(MediaType.APPLICATION_JSON);
+
+
+            mockMvc.perform(mockMvcRequestBuilders)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$").value("Invalid todo status is provided, please check input"));
+
+            verifyNoInteractions(todoService);
+        }
     }
 
     @Nested
