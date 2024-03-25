@@ -97,7 +97,8 @@ class TodoControllerTest {
 
             mockMvc.perform(mockMvcRequestBuilders)
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$").value("Unable to find com.simplesystem.todo.model.Todo with id"));
+                    .andExpect(jsonPath("$.errorMessage").value("Unable to find com.simplesystem.todo.model.Todo with id"))
+                    .andExpect(jsonPath("$.httpStatusCode").value(400));
 
             verify(todoService, times(1)).getTodoById(todoId);
         }
@@ -112,7 +113,8 @@ class TodoControllerTest {
 
             mockMvc.perform(mockMvcRequestBuilders)
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$").value("Invalid UUID string: ".concat(todoId)));
+                    .andExpect(jsonPath("$.errorMessage").value("Invalid UUID string: ".concat(todoId)))
+                    .andExpect(jsonPath("$.httpStatusCode").value(400));
 
             verifyNoInteractions(todoService);
         }
@@ -161,7 +163,8 @@ class TodoControllerTest {
 
             mockMvc.perform(mockMvcRequestBuilders)
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$").value("Invalid entity, please check due date"));
+                    .andExpect(jsonPath("$.errorMessage").value("Invalid entity, please check due date"))
+                    .andExpect(jsonPath("$.httpStatusCode").value(400));
 
             verifyNoInteractions(todoService);
         }
@@ -185,7 +188,8 @@ class TodoControllerTest {
 
             mockMvc.perform(mockMvcRequestBuilders)
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$").value("Invalid entity, please check input status"));
+                    .andExpect(jsonPath("$.errorMessage").value("Invalid entity, please check input status"))
+                    .andExpect(jsonPath("$.httpStatusCode").value(400));
 
             verifyNoInteractions(todoService);
         }
@@ -206,7 +210,8 @@ class TodoControllerTest {
 
             mockMvc.perform(mockMvcRequestBuilders)
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$").value("Invalid todo status is provided, please check input"));
+                    .andExpect(jsonPath("$.errorMessage").value("Invalid todo status is provided, please check input"))
+                    .andExpect(jsonPath("$.httpStatusCode").value(400));
 
             verifyNoInteractions(todoService);
         }
@@ -252,7 +257,8 @@ class TodoControllerTest {
 
             mockMvc.perform(mockMvcRequestBuilders)
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$").value("Given entity with id not found"));
+                    .andExpect(jsonPath("$.errorMessage").value("Given entity with id not found"))
+                    .andExpect(jsonPath("$.httpStatusCode").value(400));
 
             verify(todoService, times(1)).updateTodo(any(Todo.class));
         }
