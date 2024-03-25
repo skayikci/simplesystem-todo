@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder;
 import com.simplesystem.todo.controller.adapter.LocalDateTimeTypeAdapter;
 import com.simplesystem.todo.model.Todo;
 import com.simplesystem.todo.model.TodoRequest;
+import com.simplesystem.todo.model.TodoResponse;
 import com.simplesystem.todo.model.TodoStatus;
 import com.simplesystem.todo.service.TodoService;
 import jakarta.persistence.EntityNotFoundException;
@@ -54,6 +55,10 @@ class TodoControllerTest {
 
     private TodoRequest generateTodoRequest(UUID mockTodoItemId, String description, LocalDateTime mockCreatedDate, LocalDateTime dueDate, TodoStatus todoStatus) {
         return new TodoRequest(mockTodoItemId, description, mockCreatedDate, dueDate, null, todoStatus);
+    }
+
+    private TodoResponse generateTodoResponse(UUID todoId, String description, LocalDateTime createdDate, LocalDateTime dueDate, TodoStatus status) {
+        return new TodoResponse(todoId, description, createdDate, dueDate, null, status);
     }
 
     @Nested
@@ -224,21 +229,23 @@ class TodoControllerTest {
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
                     .create();
-            Todo todoRequest = getTodoRequest("i will update this via rest post").build();
+            var todoId = UUID.randomUUID();
+            TodoRequest todoRequest = generateTodoRequest(todoId, "i will update this via rest post", null, null, null);
+            TodoResponse todoResponse = generateTodoResponse(todoId, "i will update this via rest post", null, null, null);
             String requestUrl = "/api/v1/todo";
             MockHttpServletRequestBuilder mockMvcRequestBuilders = MockMvcRequestBuilders
                     .patch(requestUrl)
                     .content(gson.toJson(todoRequest))
                     .contentType(MediaType.APPLICATION_JSON);
-            when(todoService.updateTodo(todoRequest)).thenReturn(todoRequest);
+            when(todoService.updateTodo(todoRequest)).thenReturn(todoResponse);
 
 
             mockMvc.perform(mockMvcRequestBuilders)
                     .andExpect(status().isAccepted())
-                    .andExpect(jsonPath("$.id").value(equalTo(todoRequest.getId().toString())))
-                    .andExpect(jsonPath("$.description").value(equalTo(todoRequest.getDescription())));
+                    .andExpect(jsonPath("$.id").value(equalTo(todoRequest.id().toString())))
+                    .andExpect(jsonPath("$.description").value(equalTo(todoRequest.description())));
 
-            verify(todoService, times(1)).updateTodo(any(Todo.class));
+            verify(todoService, times(1)).updateTodo(any(TodoRequest.class));
         }
 
         @Test
@@ -246,7 +253,8 @@ class TodoControllerTest {
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
                     .create();
-            Todo todoRequest = getTodoRequest("i will update this via rest post").build();
+            TodoRequest todoRequest = generateTodoRequest(null, "i will update this via rest post",
+                    null, null, null);
             String requestUrl = "/api/v1/todo";
             MockHttpServletRequestBuilder mockMvcRequestBuilders = MockMvcRequestBuilders
                     .patch(requestUrl)
@@ -260,7 +268,7 @@ class TodoControllerTest {
                     .andExpect(jsonPath("$.errorMessage").value("Given entity with id not found"))
                     .andExpect(jsonPath("$.httpStatusCode").value(400));
 
-            verify(todoService, times(1)).updateTodo(any(Todo.class));
+            verify(todoService, times(1)).updateTodo(any(TodoRequest.class));
         }
     }
 }

@@ -37,12 +37,14 @@ public class TodoServiceImpl implements TodoService {
     }
 
     @Override
-    public Todo updateTodo(Todo todoRequest) {
-        var requestedTodoItem = todoRepository.findById(todoRequest.getId());
+    public TodoResponse updateTodo(TodoRequest todoRequest) {
+        var requestedTodoItem = todoRepository.findById(todoRequest.id());
         if (requestedTodoItem.isPresent()) {
-            return todoRepository.save(todoRequest);
+            var updateTodoItem = requestedTodoItem.get();
+            todoMapper.updateTodoFromRequest(updateTodoItem, todoRequest);
+            return todoMapper.mapEntityToResponse(todoRepository.save(updateTodoItem));
         } else {
-            log.error("Error while updating the todo item, please check the id: {}", todoRequest.getId());
+            log.error("Error while updating the todo item, please check the id: {}", todoRequest.id());
             throw new EntityNotFoundException("Given entity with id not found");
         }
     }

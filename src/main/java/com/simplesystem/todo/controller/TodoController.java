@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.simplesystem.todo.controller.exception.InvalidEntityException;
-import com.simplesystem.todo.model.Todo;
 import com.simplesystem.todo.model.TodoRequest;
 import com.simplesystem.todo.model.TodoStatus;
 import com.simplesystem.todo.service.TodoService;
@@ -46,7 +45,7 @@ public class TodoController {
     }
 
     @PatchMapping()
-    public ResponseEntity updateTodoItemById(@RequestBody Todo todoRequest) {
+    public ResponseEntity updateTodoItemById(@RequestBody TodoRequest todoRequest) {
         var todoItemReturned = todoService.updateTodo(todoRequest);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(todoItemReturned);
     }

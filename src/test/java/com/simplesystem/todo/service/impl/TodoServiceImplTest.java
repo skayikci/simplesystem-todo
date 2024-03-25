@@ -100,19 +100,22 @@ class TodoServiceImplTest {
         var mockTodoItemId = UUID.randomUUID();
         var mockCreatedDate = LocalDateTime.now();
         String description = "i will update this todo in the service";
-        LocalDateTime mockDueDate = mockCreatedDate.minusDays(-10L);
+        LocalDateTime mockDueDate = mockCreatedDate.plusDays(1L);
         Todo existingTodo = getTodo(mockTodoItemId, mockCreatedDate, description, mockDueDate);
         Todo todoUpdateRequest = getTodo(mockTodoItemId, mockCreatedDate, "updated description", mockDueDate.plusDays(1L));
         when(todoRepository.findById(mockTodoItemId)).thenReturn(Optional.ofNullable(existingTodo));
         when(todoRepository.save(any(Todo.class))).thenReturn(todoUpdateRequest);
+        TodoRequest todoRequest = generateTodoRequest(mockTodoItemId, mockCreatedDate, "updated description", mockDueDate.plusDays(1L));
+        TodoResponse todoResponse = generateTodoResponse(mockTodoItemId, mockCreatedDate, "updated description", mockCreatedDate.plusDays(1L));
+        when(todoMapper.mapEntityToResponse(todoUpdateRequest)).thenReturn(todoResponse);
 
-        var todoItemVerificationEntity = todoService.updateTodo(todoUpdateRequest);
+        var todoItemVerificationEntity = todoService.updateTodo(todoRequest);
 
-        assertEquals(mockTodoItemId, todoItemVerificationEntity.getId());
-        assertEquals("updated description", todoItemVerificationEntity.getDescription());
-        assertEquals(mockCreatedDate, todoItemVerificationEntity.getCreatedDate());
-        assertEquals(mockDueDate.plusDays(1L), todoItemVerificationEntity.getDueDate());
-        assertEquals(TodoStatus.NOT_DONE, todoItemVerificationEntity.getStatus());
+        assertEquals(mockTodoItemId, todoItemVerificationEntity.id());
+        assertEquals("updated description", todoItemVerificationEntity.description());
+        assertEquals(mockCreatedDate, todoItemVerificationEntity.createdDate());
+        assertEquals(mockDueDate, todoItemVerificationEntity.dueDate());
+        assertEquals(TodoStatus.NOT_DONE, todoItemVerificationEntity.status());
 
         verify(todoRepository, times(1)).findById(mockTodoItemId);
         verify(todoRepository, times(1)).save(any(Todo.class));
@@ -123,7 +126,7 @@ class TodoServiceImplTest {
         var mockTodoItemId = UUID.randomUUID();
         var mockCreatedDate = LocalDateTime.now();
         LocalDateTime mockDueDate = mockCreatedDate.minusDays(-10L);
-        Todo todoUpdateRequest = getTodo(mockTodoItemId, mockCreatedDate, "updated description", mockDueDate.plusDays(1L));
+        TodoRequest todoUpdateRequest = generateTodoRequest(mockTodoItemId, mockCreatedDate, "updated description", mockDueDate.plusDays(1L));
         when(todoRepository.findById(mockTodoItemId)).thenReturn(Optional.empty());
 
 

@@ -11,5 +11,5 @@ public interface TodoService {
 
     Todo getTodoById(UUID todoId) throws InvalidInputException;
 
-    Todo updateTodo(Todo any);
+    TodoResponse updateTodo(TodoRequest any);
 }
