@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.simplesystem.todo.controller.adapter.LocalDateTimeTypeAdapter;
 import com.simplesystem.todo.model.Todo;
+import com.simplesystem.todo.model.TodoRequest;
 import com.simplesystem.todo.model.TodoStatus;
 import com.simplesystem.todo.service.TodoService;
 import jakarta.persistence.EntityNotFoundException;
@@ -49,6 +50,10 @@ class TodoControllerTest {
 
     private Todo.TodoBuilder getTodoRequest(String description) {
         return Todo.builder().id(UUID.randomUUID()).description(description);
+    }
+
+    private TodoRequest generateTodoRequest(UUID mockTodoItemId, String description, LocalDateTime mockCreatedDate, LocalDateTime dueDate, TodoStatus todoStatus) {
+        return new TodoRequest(mockTodoItemId, description, mockCreatedDate, dueDate, null, todoStatus);
     }
 
     @Nested
@@ -120,7 +125,11 @@ class TodoControllerTest {
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
                     .create();
-            Todo todoRequest = getTodoRequest("i will do this via rest post").build();
+            var todoId = UUID.randomUUID();
+            String description = "i will do this via rest post";
+            LocalDateTime createdDate = LocalDateTime.now();
+            LocalDateTime dueDate = createdDate.plusDays(10L);
+            TodoRequest todoRequest = generateTodoRequest(todoId, description, createdDate, dueDate, TodoStatus.NOT_DONE);
             String requestUrl = "/api/v1/todo";
             MockHttpServletRequestBuilder mockMvcRequestBuilders = MockMvcRequestBuilders
                     .post(requestUrl)
@@ -130,7 +139,7 @@ class TodoControllerTest {
             mockMvc.perform(mockMvcRequestBuilders)
                     .andExpect(status().isCreated());
 
-            verify(todoService, times(1)).createTodo(any(Todo.class));
+            verify(todoService, times(1)).createTodo(any(TodoRequest.class));
         }
 
         @Test
@@ -139,7 +148,7 @@ class TodoControllerTest {
             String description = "i will do this with old due date";
             LocalDateTime createdDate = LocalDateTime.now();
             LocalDateTime dueDate = createdDate.minusDays(10L);
-            Todo todoRequest = getTodoRequestWithDate(todoId, description, createdDate, dueDate).build();
+            TodoRequest todoRequest = generateTodoRequest(todoId, description, createdDate, dueDate, TodoStatus.NOT_DONE);
             String requestUrl = "/api/v1/todo";
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
@@ -159,9 +168,11 @@ class TodoControllerTest {
 
         @Test
         void shouldGetInvalidEntityExceptionWhenStatusIsProvidedAsPAST_DUEOnCreation() throws Exception {
+            var todoId = UUID.randomUUID();
             String description = "i will do this with past_due creation status";
-            Todo todoRequest = getTodoRequest(description).build();
-            todoRequest.setStatus(TodoStatus.PAST_DUE);
+            LocalDateTime createdDate = LocalDateTime.now();
+            LocalDateTime dueDate = createdDate.plusDays(10L);
+            TodoRequest todoRequest = generateTodoRequest(todoId, description, createdDate, dueDate, TodoStatus.PAST_DUE);
             String requestUrl = "/api/v1/todo";
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())

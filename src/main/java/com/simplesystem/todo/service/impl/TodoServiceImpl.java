@@ -3,6 +3,8 @@ package com.simplesystem.todo.service.impl;
 import java.util.UUID;
 
 import com.simplesystem.todo.model.Todo;
+import com.simplesystem.todo.model.TodoRequest;
+import com.simplesystem.todo.model.TodoResponse;
 import com.simplesystem.todo.repository.TodoRepository;
 import com.simplesystem.todo.service.InvalidInputException;
 import com.simplesystem.todo.service.TodoService;
@@ -17,15 +19,18 @@ import org.springframework.stereotype.Service;
 public class TodoServiceImpl implements TodoService {
 
     private final TodoRepository todoRepository;
+    private final TodoMapper todoMapper;
 
     @Override
-    public Todo createTodo(Todo todoRequest) {
-        return todoRepository.save(todoRequest);
+    public TodoResponse createTodo(TodoRequest todoRequest) {
+        Todo todoToCreate = todoMapper.mapRequestToEntity(todoRequest);
+        Todo createdTodo = todoRepository.save(todoToCreate);
+        return todoMapper.mapEntityToResponse(createdTodo);
     }
 
     @Override
     public Todo getTodoById(UUID todoId) {
-        if(todoId == null) {
+        if (todoId == null) {
             throw new InvalidInputException("Id of the todo item is not provided or invalid");
         }
         return todoRepository.getReferenceById(todoId);

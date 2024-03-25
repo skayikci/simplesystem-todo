@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.simplesystem.todo.model.Todo;
+import com.simplesystem.todo.model.TodoRequest;
+import com.simplesystem.todo.model.TodoResponse;
 import com.simplesystem.todo.model.TodoStatus;
 import com.simplesystem.todo.repository.TodoRepository;
 import com.simplesystem.todo.service.InvalidInputException;
@@ -31,18 +33,33 @@ class TodoServiceImplTest {
     @Mock
     private TodoRepository todoRepository;
 
+    @Mock
+    private TodoMapper todoMapper;
+
     @Test
     void shouldAddATodoItem() {
         var mockTodoItemId = UUID.randomUUID();
         var mockCreatedDate = LocalDateTime.now();
         Todo todoItem = getTodo(mockTodoItemId, mockCreatedDate, "i will do this", mockCreatedDate.minusDays(-10L));
+        TodoRequest todoRequest = generateTodoRequest(mockTodoItemId, mockCreatedDate, "i will do this", mockCreatedDate.minusDays(-10L));
+        TodoResponse todoResponse = generateTodoResponse(mockTodoItemId, mockCreatedDate, "i will do this", mockCreatedDate.minusDays(-10L));
         when(todoRepository.save(any(Todo.class))).thenReturn(todoItem);
+        when(todoMapper.mapRequestToEntity(todoRequest)).thenReturn(todoItem);
+        when(todoMapper.mapEntityToResponse(todoItem)).thenReturn(todoResponse);
 
-        var todoItemVerificationEntity = todoService.createTodo(todoItem);
+        var todoItemVerificationEntity = todoService.createTodo(todoRequest);
 
-        assertEquals(mockTodoItemId, todoItemVerificationEntity.getId());
-        assertEquals(mockCreatedDate, todoItemVerificationEntity.getCreatedDate());
+        assertEquals(mockTodoItemId, todoItemVerificationEntity.id());
+        assertEquals(mockCreatedDate, todoItemVerificationEntity.createdDate());
         verify(todoRepository, times(1)).save(todoItem);
+    }
+
+    private TodoResponse generateTodoResponse(UUID mockTodoItemId, LocalDateTime mockCreatedDate, String description, LocalDateTime dueDate) {
+        return new TodoResponse(mockTodoItemId, description, mockCreatedDate, dueDate, null, TodoStatus.NOT_DONE);
+    }
+
+    private TodoRequest generateTodoRequest(UUID mockTodoItemId, LocalDateTime mockCreatedDate, String description, LocalDateTime dueDate) {
+        return new TodoRequest(mockTodoItemId, description, mockCreatedDate, dueDate, null, TodoStatus.NOT_DONE);
     }
 
     @Test
@@ -70,6 +87,7 @@ class TodoServiceImplTest {
 
         verifyNoInteractions(todoRepository);
     }
+
     @Test
     void shouldGetIllegalArgumentExceptionWhenIdInvalid() {
         assertThrows(IllegalArgumentException.class, () -> todoService.getTodoById(UUID.fromString("123")));
