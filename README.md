@@ -34,6 +34,8 @@
 ## Assumptions and ideas
 * I've started by creating the database schema  
 ![Database_schema](/docs/simplesystemtodo.drawio.png)
+* Then created the general todo items as list
+* The "production ready" has come during the process, so kept it updated during the development process
 
 ## To see the sql logs on command line
 * Set active profile "dev" on intellij
@@ -52,6 +54,9 @@
 
 ## Production readiness
 * add authorization
+* add prioritization
+* add labels
+* add collaboration
 * add pagination
 * add elasticsearch or solr for searching
 * add redis or memcached for cache
