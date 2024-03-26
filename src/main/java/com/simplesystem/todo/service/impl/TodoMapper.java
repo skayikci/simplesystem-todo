@@ -3,12 +3,12 @@ package com.simplesystem.todo.service.impl;
 import java.util.List;
 
 import com.simplesystem.todo.model.Todo;
-import com.simplesystem.todo.model.TodoFilterResponse;
 import com.simplesystem.todo.model.TodoRequest;
 import com.simplesystem.todo.model.TodoResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring")
 public interface TodoMapper {
@@ -22,6 +22,9 @@ public interface TodoMapper {
     @Mapping(target = "doneDate", dateFormat = "ddMMyyyy HH:mm:ss")
     TodoResponse mapEntityToResponse(Todo todoEntity);
 
+    @Mapping(target = "createdDate", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "dueDate", dateFormat = "ddMMyyyy HH:mm:ss", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "doneDate", dateFormat = "ddMMyyyy HH:mm:ss", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateTodoFromRequest(@MappingTarget Todo requestedTodoItem, TodoRequest todoRequest);
 
     List<TodoResponse> mapEntityListToResponse(List<Todo> filteredTodoList);
