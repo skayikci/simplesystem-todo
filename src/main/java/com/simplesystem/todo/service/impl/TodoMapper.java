@@ -12,6 +12,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring")
 public interface TodoMapper {
+    @Mapping(target = "id", defaultExpression = "java(UUID.randomUUID())")
     @Mapping(target = "status", defaultValue = "NOT_DONE")
     @Mapping(target = "createdDate", defaultExpression = "java(java.time.LocalDateTime.now())", dateFormat = "ddMMyyyy HH:mm:ss")
     Todo mapRequestToEntity(TodoRequest todoRequest);

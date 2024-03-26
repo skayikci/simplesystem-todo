@@ -7,7 +7,7 @@
 * Docker Compose Support
 * Lombok
 * Java 17 (not needed when ran on docker)
-* Gradle (not needed when ran on docker)
+* Gradle (not needed when ran on docker, or you can run with gradle wrapper installed in the project - see gradlew)
 
 
 ## Running on docker
@@ -19,7 +19,26 @@
 * Make sure your local docker is up and running
 * Command to stop the service:
   * docker-compose down -f compose.yaml
-  
+
+## Running on command line
+* Build the project: (make sure to change directory of the project)
+  * ./gradlew clean
+  * ./gradlew build
+* Run the tests locally
+  * ./gradlew test
+* See the test report : build/reports/tests/test/index.html
+
+## Calling endpoints via Postman
+* Use the postman collection under /docs
+
+## Assumptions and ideas
+* I've started by creating the database schema
+  ![Database_schema](/docs/simplesystemtodo.drawio.png)
+
+## To see the sql logs on command line
+* Set active profile "dev" on intellij
+* Set active profile "dev" on command line :
+  * ./gradlew bootRun --args='--spring.profiles.active=dev'
 
 ## Todo List
 - [X] Create Database Diagram
@@ -33,6 +52,7 @@
 
 ## Production readiness
 * add authorization
+* add pagination
 * add elasticsearch or solr for searching
 * add redis or memcached for cache
 * add thymeleaf for email sending
@@ -41,7 +61,7 @@
 * deploy the application to ACR
 * create CI/CD with terraform and github actions
 
-
+----------
 ## Project requirements and requests:
 Design and implement a backend service allowing basic management of a simple to-do list.
 
