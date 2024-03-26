@@ -32,8 +32,8 @@
 * Use the postman collection under /docs
 
 ## Assumptions and ideas
-* I've started by creating the database schema
-  ![Database_schema](/docs/simplesystemtodo.drawio.png)
+* I've started by creating the database schema  
+![Database_schema](/docs/simplesystemtodo.drawio.png)
 
 ## To see the sql logs on command line
 * Set active profile "dev" on intellij
