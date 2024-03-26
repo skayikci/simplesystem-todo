@@ -45,6 +45,7 @@ class TodoServiceIntegrationTest {
     @BeforeEach
     void setup() {
         System.setProperty("spring.datasource.url", postgreSQLContainer.getJdbcUrl());
+        System.setProperty("spring.datasource.driver-class-name", postgreSQLContainer.getDriverClassName());
         System.setProperty("spring.datasource.username", postgreSQLContainer.getUsername());
         System.setProperty("spring.datasource.password", postgreSQLContainer.getPassword());
     }
@@ -64,7 +65,7 @@ class TodoServiceIntegrationTest {
                 .build();
         var createdTodo = todoRepository.save(todoEntity);
         var formatter = DateTimeFormatter.ofPattern("ddMMyyyy HH:mm:ss");
-        TodoRequest todoRequest = new TodoRequestBuilder()
+        TodoRequest todoRequest = TodoRequestBuilder.aTodoRequest()
                 .withDescription("generated todo request")
                 .withStatus(TodoStatus.DONE)
                 .withId(createdTodo.getId())
@@ -87,7 +88,7 @@ class TodoServiceIntegrationTest {
                 .build();
         todoRepository.save(todoEntity);
         var arbitraryId = UUID.randomUUID();
-        var todoRequest = new TodoRequestBuilder()
+        var todoRequest = TodoRequestBuilder.aTodoRequest()
                 .withId(arbitraryId)
                 .withDescription("test with some arbitrary generated uuid")
                 .withStatus(TodoStatus.DONE)
@@ -101,7 +102,7 @@ class TodoServiceIntegrationTest {
 
     @Test
     void shouldCreateTodoItemCorrectly() {
-        var todoRequest = new TodoRequestBuilder()
+        var todoRequest = TodoRequestBuilder.aTodoRequest()
                 .withDescription("Create todo item with integration")
                 .withStatus(TodoStatus.NOT_DONE)
                 .build();

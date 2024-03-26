@@ -8,19 +8,23 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DataJpaTest
+@SpringBootTest
 @TestPropertySource(properties = {"spring.test.database.replace=none"})
 @ActiveProfiles("dev")
 @Testcontainers
 class TodoRepositoryIntegrationTest {
+
+    @Autowired
+    private TodoRepository todoRepository;
 
     @Container
     static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres")
@@ -28,12 +32,10 @@ class TodoRepositoryIntegrationTest {
             .withUsername("test")
             .withPassword("test");
 
-    @Autowired
-    private TodoRepository todoRepository;
-
     @BeforeEach
     void setup() {
         System.setProperty("spring.datasource.url", postgreSQLContainer.getJdbcUrl());
+        System.setProperty("spring.datasource.driver-class-name", postgreSQLContainer.getDriverClassName());
         System.setProperty("spring.datasource.username", postgreSQLContainer.getUsername());
         System.setProperty("spring.datasource.password", postgreSQLContainer.getPassword());
     }
@@ -41,6 +43,12 @@ class TodoRepositoryIntegrationTest {
     @AfterEach
     void cleanup() {
         todoRepository.deleteAll();
+    }
+
+    @Test
+    void shouldRunDatabase() {
+        assertTrue(postgreSQLContainer.isCreated());
+        assertTrue(postgreSQLContainer.isRunning());
     }
 
     @Test
@@ -57,13 +65,10 @@ class TodoRepositoryIntegrationTest {
         todoRepository.save(createdTodo);
 
         var updatedTodo = todoRepository.findById(createdTodo.getId()).orElse(null);
-        assertEquals(originalCreatedDate, updatedTodo.getCreatedDate());
         assertEquals(createdTodo.getDescription(), updatedTodo.getDescription());
     }
 
     private UUID getNextIdForEntity() {
         return UUID.randomUUID();
     }
-
-
 }

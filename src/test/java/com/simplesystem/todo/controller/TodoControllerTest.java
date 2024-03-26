@@ -13,6 +13,7 @@ import com.simplesystem.todo.model.TodoRequest;
 import com.simplesystem.todo.model.TodoResponse;
 import com.simplesystem.todo.model.TodoStatus;
 import com.simplesystem.todo.service.TodoService;
+import com.simplesystem.todo.util.TodoResponseBuilder;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -48,23 +49,17 @@ class TodoControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    private TodoRequest generateTodoRequest(UUID mockTodoItemId, String description, LocalDateTime mockCreatedDate, LocalDateTime dueDate, TodoStatus todoStatus) {
-        return new TodoRequest(mockTodoItemId, description, mockCreatedDate, dueDate, null, todoStatus);
-    }
-
-    private TodoResponse generateTodoResponseWithStatus(UUID todoId, String description, TodoStatus status) {
-        LocalDateTime createdDate = LocalDateTime.now();
-        LocalDateTime dueDate = createdDate.minusDays(-10L);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy HH:mm:ss");
-        return new TodoResponse(todoId, description, formatter.format(createdDate), formatter.format(dueDate), null, status);
-    }
-
     @Nested
     class GetByIdTests {
         @Test
         void shouldGetTodoItemById() throws Exception {
             var todoId = UUID.randomUUID();
-            TodoResponse todoResponse = generateTodoResponseWithStatus(todoId,"i will get this todo by id", TodoStatus.NOT_DONE);
+            TodoResponse todoResponse = TodoResponseBuilder.aTodoResponse()
+                    .withId(todoId)
+                    .withDescription("i will get this todo by id")
+                    .withStatus(TodoStatus.NOT_DONE)
+                    .build();
+
             String requestUrl = "/api/v1/todo/".concat(todoId.toString());
             MockHttpServletRequestBuilder mockMvcRequestBuilders = MockMvcRequestBuilders
                     .get(requestUrl)
@@ -317,5 +312,16 @@ class TodoControllerTest {
 
             verify(todoService, times(1)).updateTodo(any(TodoRequest.class));
         }
+    }
+
+    private TodoRequest generateTodoRequest(UUID mockTodoItemId, String description, LocalDateTime mockCreatedDate, LocalDateTime dueDate, TodoStatus todoStatus) {
+        return new TodoRequest(mockTodoItemId, description, mockCreatedDate, dueDate, null, todoStatus);
+    }
+
+    private TodoResponse generateTodoResponseWithStatus(UUID todoId, String description, TodoStatus status) {
+        LocalDateTime createdDate = LocalDateTime.now();
+        LocalDateTime dueDate = createdDate.minusDays(-10L);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy HH:mm:ss");
+        return new TodoResponse(todoId, description, formatter.format(createdDate), formatter.format(dueDate), null, status);
     }
 }

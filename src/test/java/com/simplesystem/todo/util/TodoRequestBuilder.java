@@ -6,13 +6,20 @@ import java.util.UUID;
 import com.simplesystem.todo.model.TodoRequest;
 import com.simplesystem.todo.model.TodoStatus;
 
-public class TodoRequestBuilder {
+public final class TodoRequestBuilder {
     private UUID id;
     private String description;
     private LocalDateTime createdDate;
     private LocalDateTime dueDate;
     private LocalDateTime doneDate;
     private TodoStatus status;
+
+    private TodoRequestBuilder() {
+    }
+
+    public static TodoRequestBuilder aTodoRequest() {
+        return new TodoRequestBuilder();
+    }
 
     public TodoRequestBuilder withId(UUID id) {
         this.id = id;
