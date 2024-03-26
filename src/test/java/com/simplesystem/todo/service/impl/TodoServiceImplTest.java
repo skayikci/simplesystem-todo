@@ -13,6 +13,7 @@ import com.simplesystem.todo.model.TodoResponse;
 import com.simplesystem.todo.model.TodoStatus;
 import com.simplesystem.todo.repository.TodoRepository;
 import com.simplesystem.todo.service.InvalidInputException;
+import com.simplesystem.todo.util.TodoRequestBuilder;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,8 +46,14 @@ class TodoServiceImplTest {
         var mockTodoItemId = UUID.randomUUID();
         var mockCreatedDate = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy HH:mm:ss");
-        Todo todoItem = getTodo(mockTodoItemId, mockCreatedDate, "i will do this", mockCreatedDate.minusDays(-10L), TodoStatus.NOT_DONE);
-        TodoRequest todoRequest = generateTodoRequest(mockTodoItemId, mockCreatedDate, "i will do this", mockCreatedDate.minusDays(-10L));
+        Todo todoItem = getTodo(mockTodoItemId, mockCreatedDate, "i will do this", mockCreatedDate.plusDays(10L), TodoStatus.NOT_DONE);
+        TodoRequest todoRequest = new TodoRequestBuilder()
+                .withId(mockTodoItemId)
+                .withDescription("i will do this")
+                .withCreatedDate(mockCreatedDate)
+                .withDueDate(mockCreatedDate.plusDays(10L))
+                .withStatus(TodoStatus.NOT_DONE)
+                .build();
         TodoResponse todoResponse = generateTodoResponse(mockTodoItemId, "i will do this", formatter.format(mockCreatedDate), formatter.format(mockCreatedDate.minusDays(-10L)), TodoStatus.NOT_DONE);
         when(todoRepository.save(any(Todo.class))).thenReturn(todoItem);
         when(todoMapper.mapRequestToEntity(todoRequest)).thenReturn(todoItem);
@@ -58,14 +65,6 @@ class TodoServiceImplTest {
         assertEquals(formatter.format(mockCreatedDate), todoItemVerificationEntity.createdDate());
 
         verify(todoRepository, times(1)).save(todoItem);
-    }
-
-    private TodoResponse generateTodoResponse(UUID mockTodoItemId, String description, String mockCreatedDate, String dueDate, TodoStatus status) {
-        return new TodoResponse(mockTodoItemId, description, mockCreatedDate, dueDate, null, status);
-    }
-
-    private TodoRequest generateTodoRequest(UUID mockTodoItemId, LocalDateTime mockCreatedDate, String description, LocalDateTime dueDate) {
-        return new TodoRequest(mockTodoItemId, description, mockCreatedDate, dueDate, null, TodoStatus.NOT_DONE);
     }
 
     @Test
@@ -116,7 +115,13 @@ class TodoServiceImplTest {
         Todo todoUpdateRequest = getTodo(mockTodoItemId, mockCreatedDate, "updated description", mockDueDate.plusDays(1L), TodoStatus.NOT_DONE);
         when(todoRepository.findById(mockTodoItemId)).thenReturn(Optional.ofNullable(existingTodo));
         when(todoRepository.save(any(Todo.class))).thenReturn(todoUpdateRequest);
-        TodoRequest todoRequest = generateTodoRequest(mockTodoItemId, mockCreatedDate, "updated description", mockDueDate.plusDays(1L));
+        TodoRequest todoRequest = new TodoRequestBuilder()
+                .withId(mockTodoItemId)
+                .withDescription("updated description")
+                .withCreatedDate(mockCreatedDate)
+                .withDueDate(mockCreatedDate.plusDays(1L))
+                .withStatus(TodoStatus.NOT_DONE)
+                .build();
         TodoResponse todoResponse = generateTodoResponse(mockTodoItemId, "updated description", formatter.format(mockCreatedDate), formatter.format(mockCreatedDate.plusDays(1L)), TodoStatus.NOT_DONE);
         when(todoMapper.mapEntityToResponse(todoUpdateRequest)).thenReturn(todoResponse);
 
@@ -136,8 +141,11 @@ class TodoServiceImplTest {
     void shouldNotUpdateATodoItemWhenNotFound() {
         var mockTodoItemId = UUID.randomUUID();
         var mockCreatedDate = LocalDateTime.now();
-        LocalDateTime mockDueDate = mockCreatedDate.minusDays(-10L);
-        TodoRequest todoUpdateRequest = generateTodoRequest(mockTodoItemId, mockCreatedDate, "updated description", mockDueDate.plusDays(1L));
+        TodoRequest todoUpdateRequest = new TodoRequestBuilder()
+                .withId(mockTodoItemId)
+                .withDescription("updated description")
+                .withStatus(TodoStatus.NOT_DONE)
+                .build();
         when(todoRepository.findById(mockTodoItemId)).thenReturn(Optional.empty());
 
 
@@ -173,6 +181,10 @@ class TodoServiceImplTest {
                 .dueDate(mockDueDate)
                 .status(status)
                 .build();
+    }
+
+    private TodoResponse generateTodoResponse(UUID mockTodoItemId, String description, String mockCreatedDate, String dueDate, TodoStatus status) {
+        return new TodoResponse(mockTodoItemId, description, mockCreatedDate, dueDate, null, status);
     }
 
 }
