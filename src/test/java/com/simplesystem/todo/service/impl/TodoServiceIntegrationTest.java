@@ -8,6 +8,7 @@ import com.simplesystem.todo.model.Todo;
 import com.simplesystem.todo.model.TodoRequest;
 import com.simplesystem.todo.model.TodoStatus;
 import com.simplesystem.todo.repository.TodoRepository;
+import com.simplesystem.todo.util.TodoRequestBuilder;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
@@ -62,8 +64,11 @@ class TodoServiceIntegrationTest {
                 .build();
         var createdTodo = todoRepository.save(todoEntity);
         var formatter = DateTimeFormatter.ofPattern("ddMMyyyy HH:mm:ss");
-        var todoRequest = new TodoRequest(createdTodo.getId(), "generated todo request",
-                null, null, null, TodoStatus.DONE);
+        TodoRequest todoRequest = new TodoRequestBuilder()
+                .withDescription("generated todo request")
+                .withStatus(TodoStatus.DONE)
+                .withId(createdTodo.getId())
+                .build();
 
         var updatedTodo = todoService.updateTodo(todoRequest);
 
@@ -82,13 +87,30 @@ class TodoServiceIntegrationTest {
                 .build();
         todoRepository.save(todoEntity);
         var arbitraryId = UUID.randomUUID();
-        var todoRequest = new TodoRequest(arbitraryId, "test with some arbitrary generated uuid",
-                null, null, null, TodoStatus.DONE);
+        var todoRequest = new TodoRequestBuilder()
+                .withId(arbitraryId)
+                .withDescription("test with some arbitrary generated uuid")
+                .withStatus(TodoStatus.DONE)
+                .build();
 
         assertThrows(EntityNotFoundException.class, () -> todoService.updateTodo(todoRequest));
 
         var updatedTodoVerificationEntity = todoRepository.findById(arbitraryId);
         assertThat(updatedTodoVerificationEntity).isEmpty();
+    }
+
+    @Test
+    void shouldCreateTodoItemCorrectly() {
+        var todoRequest = new TodoRequestBuilder()
+                .withDescription("Create todo item with integration")
+                .withStatus(TodoStatus.NOT_DONE)
+                .build();
+
+        var createdTodo = todoService.createTodo(todoRequest);
+
+        assertEquals(todoRequest.description(), createdTodo.description());
+        assertNotNull(createdTodo.createdDate());
+        assertEquals(TodoStatus.NOT_DONE, createdTodo.status());
     }
 
     private UUID getNextIdForEntity() {
