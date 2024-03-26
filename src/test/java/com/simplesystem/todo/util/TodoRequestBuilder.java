@@ -24,7 +24,7 @@ public class TodoRequestBuilder {
         return this;
     }
 
-    public TodoRequestBuilder withCreatedDate(String id) {
+    public TodoRequestBuilder withCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
         return this;
     }
