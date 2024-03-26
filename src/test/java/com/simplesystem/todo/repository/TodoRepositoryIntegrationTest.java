@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestPropertySource(properties = {"spring.test.database.replace=none"})
 @ActiveProfiles("dev")
 @Testcontainers
-class TodoServiceIntegrationTest {
+class TodoRepositoryIntegrationTest {
 
     @Container
     static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres")

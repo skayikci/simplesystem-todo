@@ -8,25 +8,25 @@ import com.simplesystem.todo.model.Todo;
 import com.simplesystem.todo.model.TodoRequest;
 import com.simplesystem.todo.model.TodoStatus;
 import com.simplesystem.todo.repository.TodoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DataJpaTest
+@SpringBootTest
 @TestPropertySource(properties = {"spring.test.database.replace=none"})
 @ActiveProfiles("dev")
 @Testcontainers
-@ComponentScan(basePackages = {"com.simplesystem.todo.service.impl"})
 class TodoServiceIntegrationTest {
     @Container
     static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres")
@@ -62,14 +62,33 @@ class TodoServiceIntegrationTest {
                 .build();
         var createdTodo = todoRepository.save(todoEntity);
         var formatter = DateTimeFormatter.ofPattern("ddMMyyyy HH:mm:ss");
-
         var todoRequest = new TodoRequest(createdTodo.getId(), "generated todo request",
-                null, null, null, TodoStatus.NOT_DONE);
-        var updatedTodo = todoService.updateTodo(todoRequest);
+                null, null, null, TodoStatus.DONE);
 
+        var updatedTodo = todoService.updateTodo(todoRequest);
 
         assertEquals(createdTodo.getCreatedDate().format(formatter), LocalDateTime.parse(updatedTodo.createdDate()).format(formatter));
         assertEquals(todoRequest.description(), updatedTodo.description());
+        assertEquals(TodoStatus.DONE, updatedTodo.status());
+    }
+
+    @Test
+    void shouldNotUpdateWhenTodoWithIdNotFound() {
+        var originalCreatedDate = LocalDateTime.now().minusDays(1);
+        var todoEntity = Todo.builder()
+                .description("I will test this with integration")
+                .createdDate(originalCreatedDate)
+                .id(getNextIdForEntity())
+                .build();
+        todoRepository.save(todoEntity);
+        var arbitraryId = UUID.randomUUID();
+        var todoRequest = new TodoRequest(arbitraryId, "test with some arbitrary generated uuid",
+                null, null, null, TodoStatus.DONE);
+
+        assertThrows(EntityNotFoundException.class, () -> todoService.updateTodo(todoRequest));
+
+        var updatedTodoVerificationEntity = todoRepository.findById(arbitraryId);
+        assertThat(updatedTodoVerificationEntity).isEmpty();
     }
 
     private UUID getNextIdForEntity() {
